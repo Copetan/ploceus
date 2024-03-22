@@ -98,6 +98,9 @@ public class PloceusGradleExtension implements PloceusGradleExtensionApi {
 		project.getConfigurations().register(Constants.NESTS_CONFIGURATION);
 		project.getConfigurations().register(Constants.CLIENT_NESTS_CONFIGURATION);
 		project.getConfigurations().register(Constants.SERVER_NESTS_CONFIGURATION);
+		project.getConfigurations().register(Constants.SIGNATURES_CONFIGURATION);
+		project.getConfigurations().register(Constants.CLIENT_SIGNATURES_CONFIGURATION);
+		project.getConfigurations().register(Constants.SERVER_SIGNATURES_CONFIGURATION);
 		project.getExtensions().getExtraProperties().set(Constants.VERSION_MANIFEST_PROPERTY, Constants.VERSION_MANIFEST_URL);
 
 		loom.addMinecraftJarProcessor(NesterProcessor.class, this);
