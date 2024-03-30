@@ -28,11 +28,21 @@ public class Constants {
 	public static final String CALAMUS_INTERMEDIARY_MAVEN_GROUP = "net.ornithemc";
 	public static final String CALAMUS_GEN1_MAPPINGS = "calamus-intermediary:%s";
 	public static String calamusGen1Url(GameSide side) {
-		return MAVEN_URL + "/net/ornithemc/calamus-intermediary/%1$s" + side.suffix()+ "/calamus-intermediary-%1$s" + side.suffix() + "-v2.jar";
+		return MAVEN_URL + "/net/ornithemc/calamus-intermediary/%1$s" + side.suffix() + "/calamus-intermediary-%1$s" + side.suffix() + "-v2.jar";
 	}
 	public static final String CALAMUS_GEN2_MAPPINGS = "calamus-intermediary-gen%d:%s";
 	public static String calamusGen2Url(int generation) {
 		return MAVEN_URL + "/net/ornithemc/calamus-intermediary-gen" + generation + "/%1$s/calamus-intermediary-gen" + generation + "-%1$s-v2.jar";
+	}
+
+	public static final String FEATHER_MAVEN_GROUP = "net.ornithemc";
+	public static final String FEATHER_GEN1_MAPPINGS = "feather:%s%s+build.%s";
+	public static String featherGen1Mappings(String mc, GameSide side, int build) {
+		return FEATHER_MAVEN_GROUP + ":" + String.format(FEATHER_GEN1_MAPPINGS, mc, side, build);
+	}
+	public static final String FEATHER_GEN2_MAPPINGS = "feather-gen%s:%s+build.%s";
+	public static String featherGen2Mappings(int generation, String mc, int build) {
+		return FEATHER_MAVEN_GROUP + ":" + String.format(FEATHER_GEN2_MAPPINGS, generation, mc, build);
 	}
 
 	public static final String MANIFEST_PATH = "META-INF/MANIFEST.MF";

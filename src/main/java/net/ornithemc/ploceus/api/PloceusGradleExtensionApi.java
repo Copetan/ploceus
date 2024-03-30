@@ -1,9 +1,13 @@
 package net.ornithemc.ploceus.api;
 
+import org.gradle.api.artifacts.Dependency;
+
 import net.ornithemc.ploceus.mcp.McpForgeMappingsSpec;
 import net.ornithemc.ploceus.mcp.McpModernMappingsSpec;
 
 public interface PloceusGradleExtensionApi {
+
+	Dependency featherMappings(int build);
 
 	McpModernMappingsSpec mcpMappings(String channel, String build);
 

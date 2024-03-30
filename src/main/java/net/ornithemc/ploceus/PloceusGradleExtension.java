@@ -13,6 +13,7 @@ import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
 import org.gradle.api.Project;
+import org.gradle.api.artifacts.Dependency;
 import org.gradle.api.provider.Property;
 
 import com.google.gson.Gson;
@@ -136,6 +137,13 @@ public class PloceusGradleExtension implements PloceusGradleExtensionApi {
 
 	public SigsProvider getSigsProvider() {
 		return sigsProvider.get();
+	}
+
+	@Override
+	public Dependency featherMappings(int build) {
+		return project.getDependencies().create(generation.get() == 1
+			? Constants.featherGen1Mappings(minecraftVersion(), side.get(), build)
+			: Constants.featherGen2Mappings(generation.get(), minecraftVersion(), build));
 	}
 
 	@Override
