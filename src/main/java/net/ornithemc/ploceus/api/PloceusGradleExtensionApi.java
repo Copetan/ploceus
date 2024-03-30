@@ -17,6 +17,18 @@ public interface PloceusGradleExtensionApi {
 
 	McpForgeMappingsSpec mcpForgeMappings(String mc, String version);
 
+	Dependency nests(int build);
+
+	Dependency nests(int build, String side);
+
+	Dependency nests(int build, GameSide side);
+
+	Dependency sparrow(int build);
+
+	Dependency sparrow(int build, String side);
+
+	Dependency sparrow(int build, GameSide side);
+
 	void dependOsl(String version) throws Exception;
 
 	void dependOsl(String version, String side) throws Exception;

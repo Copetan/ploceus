@@ -180,6 +180,36 @@ public class PloceusGradleExtension implements PloceusGradleExtensionApi {
 	}
 
 	@Override
+	public Dependency nests(int build) {
+		return nests(build, getGeneration().get() == 1 ? side.get() : GameSide.MERGED);
+	}
+
+	@Override
+	public Dependency nests(int build, String side) {
+		return nests(build, GameSide.of(side));
+	}
+
+	@Override
+	public Dependency nests(int build, GameSide side) {
+		return project.getDependencies().create(Constants.nests(minecraftVersion(), side, build));
+	}
+
+	@Override
+	public Dependency sparrow(int build) {
+		return sparrow(build, getGeneration().get() == 1 ? side.get() : GameSide.MERGED);
+	}
+
+	@Override
+	public Dependency sparrow(int build, String side) {
+		return sparrow(build, GameSide.of(side));
+	}
+
+	@Override
+	public Dependency sparrow(int build, GameSide side) {
+		return project.getDependencies().create(Constants.sparrow(minecraftVersion(), side, build));
+	}
+
+	@Override
 	public void dependOsl(String version) throws Exception {
 		dependOsl(version, GameSide.MERGED);
 	}
