@@ -141,9 +141,11 @@ public class PloceusGradleExtension implements PloceusGradleExtensionApi {
 
 	@Override
 	public Dependency featherMappings(int build) {
-		return project.getDependencies().create(generation.get() == 1
-			? Constants.featherGen1Mappings(minecraftVersion(), side.get(), build)
-			: Constants.featherGen2Mappings(generation.get(), minecraftVersion(), build));
+		return project.getDependencies().create(
+			getGeneration().get() == 1
+				? Constants.featherGen1Mappings(minecraftVersion(), side.get(), build)
+				: Constants.featherGen2Mappings(getGeneration().get(), minecraftVersion(), build)
+		);
 	}
 
 	@Override
@@ -155,10 +157,10 @@ public class PloceusGradleExtension implements PloceusGradleExtensionApi {
 	public McpModernMappingsSpec mcpMappings(String channel, String mc, String build) {
 		return new McpModernMappingsSpec(
 			getGeneration().get() == 1
-				? FileSpec.create(String.format(Constants.CALAMUS_INTERMEDIARY_MAVEN_GROUP + ":" + Constants.CALAMUS_GEN1_MAPPINGS, mc))
-				: FileSpec.create(String.format(Constants.CALAMUS_INTERMEDIARY_MAVEN_GROUP + ":" + Constants.CALAMUS_GEN2_MAPPINGS, getGeneration().get(), mc)),
-			FileSpec.create(String.format(Constants.MCP_MAVEN_GROUP + ":" + Constants.SRG_MAPPINGS, mc)),
-			FileSpec.create(String.format(Constants.MCP_MAVEN_GROUP + ":" + Constants.MCP_MAPPINGS, channel, build, mc))
+				? FileSpec.create(String.format(Constants.CALAMUS_GEN1_MAPPINGS, mc))
+				: FileSpec.create(String.format(Constants.CALAMUS_GEN2_MAPPINGS, getGeneration().get(), mc)),
+			FileSpec.create(String.format(Constants.SRG_MAPPINGS, mc)),
+			FileSpec.create(String.format(Constants.MCP_MAPPINGS, channel, build, mc))
 		);
 	}
 
@@ -171,9 +173,9 @@ public class PloceusGradleExtension implements PloceusGradleExtensionApi {
 	public McpForgeMappingsSpec mcpForgeMappings(String mc, String version) {
 		return new McpForgeMappingsSpec(
 			getGeneration().get() == 1
-				? FileSpec.create(String.format(Constants.CALAMUS_INTERMEDIARY_MAVEN_GROUP + ":" + Constants.CALAMUS_GEN1_MAPPINGS, mc))
-				: FileSpec.create(String.format(Constants.CALAMUS_INTERMEDIARY_MAVEN_GROUP + ":" + Constants.CALAMUS_GEN2_MAPPINGS, getGeneration().get(), mc)),
-			FileSpec.create(String.format(Constants.FORGE_MAVEN_GROUP+ ":" + Constants.FORGE_SRC, mc, version))
+				? FileSpec.create(String.format(Constants.CALAMUS_GEN1_MAPPINGS, mc))
+				: FileSpec.create(String.format(Constants.CALAMUS_GEN2_MAPPINGS, getGeneration().get(), mc)),
+			FileSpec.create(String.format(Constants.FORGE_SRC, mc, version))
 		);
 	}
 

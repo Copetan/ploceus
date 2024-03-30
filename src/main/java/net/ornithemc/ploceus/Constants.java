@@ -26,11 +26,11 @@ public class Constants {
 	public static final String VERSION_MANIFEST_URL = "https://skyrising.github.io/mc-versions/version_manifest.json";
 
 	public static final String CALAMUS_INTERMEDIARY_MAVEN_GROUP = "net.ornithemc";
-	public static final String CALAMUS_GEN1_MAPPINGS = "calamus-intermediary:%s";
+	public static final String CALAMUS_GEN1_MAPPINGS = CALAMUS_INTERMEDIARY_MAVEN_GROUP + ":calamus-intermediary:%s";
 	public static String calamusGen1Url(GameSide side) {
 		return MAVEN_URL + "/net/ornithemc/calamus-intermediary/%1$s" + side.suffix() + "/calamus-intermediary-%1$s" + side.suffix() + "-v2.jar";
 	}
-	public static final String CALAMUS_GEN2_MAPPINGS = "calamus-intermediary-gen%d:%s";
+	public static final String CALAMUS_GEN2_MAPPINGS = CALAMUS_INTERMEDIARY_MAVEN_GROUP + ":calamus-intermediary-gen%d:%s";
 	public static String calamusGen2Url(int generation) {
 		return MAVEN_URL + "/net/ornithemc/calamus-intermediary-gen" + generation + "/%1$s/calamus-intermediary-gen" + generation + "-%1$s-v2.jar";
 	}
@@ -55,10 +55,10 @@ public class Constants {
 	public static final String OSL_MODULE_META_ENDPOINT = "/v3/versions/osl/%s/%s/%s";
 
 	public static final String MCP_MAVEN_GROUP = "de.oceanlabs.mcp";
-	public static final String SRG_MAPPINGS = "mcp:%s:srg@zip";
-	public static final String MCP_MAPPINGS = "mcp_%s:%s-%s@zip";
+	public static final String SRG_MAPPINGS = MCP_MAVEN_GROUP + ":mcp:%s:srg@zip";
+	public static final String MCP_MAPPINGS = MCP_MAVEN_GROUP + ":mcp_%s:%s-%s@zip";
 
 	public static final String FORGE_MAVEN_GROUP = "net.minecraftforge.mcp";
-	public static final String FORGE_SRC = "forge:%s-%s:src@zip";
+	public static final String FORGE_SRC = FORGE_MAVEN_GROUP + ":forge:%s-%s:src@zip";
 
 }
