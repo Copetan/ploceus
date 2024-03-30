@@ -36,13 +36,13 @@ public class Constants {
 	}
 
 	public static final String FEATHER_MAVEN_GROUP = "net.ornithemc";
-	public static final String FEATHER_GEN1_MAPPINGS = "feather:%s%s+build.%s";
+	public static final String FEATHER_GEN1_MAPPINGS = FEATHER_MAVEN_GROUP + ":feather:%s%s+build.%s";
 	public static String featherGen1Mappings(String mc, GameSide side, int build) {
-		return FEATHER_MAVEN_GROUP + ":" + String.format(FEATHER_GEN1_MAPPINGS, mc, side, build);
+		return String.format(FEATHER_GEN1_MAPPINGS, mc, side.suffix(), build);
 	}
-	public static final String FEATHER_GEN2_MAPPINGS = "feather-gen%s:%s+build.%s";
+	public static final String FEATHER_GEN2_MAPPINGS = FEATHER_MAVEN_GROUP + ":feather-gen%s:%s+build.%s";
 	public static String featherGen2Mappings(int generation, String mc, int build) {
-		return FEATHER_MAVEN_GROUP + ":" + String.format(FEATHER_GEN2_MAPPINGS, generation, mc, build);
+		return String.format(FEATHER_GEN2_MAPPINGS, generation, mc, build);
 	}
 
 	public static final String MANIFEST_PATH = "META-INF/MANIFEST.MF";
