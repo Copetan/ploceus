@@ -7,7 +7,7 @@ import net.ornithemc.ploceus.mcp.McpModernMappingsSpec;
 
 public interface PloceusGradleExtensionApi {
 
-	Dependency featherMappings(int build);
+	Dependency featherMappings(String build);
 
 	McpModernMappingsSpec mcpMappings(String channel, String build);
 
@@ -17,17 +17,17 @@ public interface PloceusGradleExtensionApi {
 
 	McpForgeMappingsSpec mcpForgeMappings(String mc, String version);
 
-	Dependency nests(int build);
+	Dependency nests(String build);
 
-	Dependency nests(int build, String side);
+	Dependency nests(String build, String side);
 
-	Dependency nests(int build, GameSide side);
+	Dependency nests(String build, GameSide side);
 
-	Dependency sparrow(int build);
+	Dependency sparrow(String build);
 
-	Dependency sparrow(int build, String side);
+	Dependency sparrow(String build, String side);
 
-	Dependency sparrow(int build, GameSide side);
+	Dependency sparrow(String build, GameSide side);
 
 	void dependOsl(String version) throws Exception;
 

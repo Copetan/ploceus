@@ -37,23 +37,23 @@ public class Constants {
 
 	public static final String FEATHER_MAVEN_GROUP = "net.ornithemc";
 	public static final String FEATHER_GEN1_MAPPINGS = FEATHER_MAVEN_GROUP + ":feather:%s%s+build.%s";
-	public static String featherGen1Mappings(String mc, GameSide side, int build) {
+	public static String featherGen1Mappings(String mc, GameSide side, String build) {
 		return String.format(FEATHER_GEN1_MAPPINGS, mc, side.suffix(), build);
 	}
 	public static final String FEATHER_GEN2_MAPPINGS = FEATHER_MAVEN_GROUP + ":feather-gen%s:%s+build.%s";
-	public static String featherGen2Mappings(int generation, String mc, int build) {
+	public static String featherGen2Mappings(int generation, String mc, String build) {
 		return String.format(FEATHER_GEN2_MAPPINGS, generation, mc, build);
 	}
 
 	public static final String NESTS_MAVEN_GROUP = "net.ornithemc";
 	public static final String NESTS = NESTS_MAVEN_GROUP + ":nests:%s%s+build.%s";
-	public static String nests(String mc, GameSide side, int build) {
+	public static String nests(String mc, GameSide side, String build) {
 		return String.format(NESTS, mc, side.suffix(), build);
 	}
 
 	public static final String SPARROW_MAVEN_GROUP = "net.ornithemc";
 	public static final String SPARROW = SPARROW_MAVEN_GROUP + ":sparrow:%s%s+build.%s";
-	public static String sparrow(String mc, GameSide side, int build) {
+	public static String sparrow(String mc, GameSide side, String build) {
 		return String.format(SPARROW, mc, side.suffix(), build);
 	}
 
