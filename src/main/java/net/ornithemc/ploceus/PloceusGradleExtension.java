@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
+import org.gradle.api.Action;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.Dependency;
 import org.gradle.api.provider.Property;
@@ -21,6 +22,7 @@ import com.google.gson.GsonBuilder;
 
 import net.fabricmc.loom.LoomGradleExtension;
 import net.fabricmc.loom.api.mappings.layered.spec.FileSpec;
+import net.fabricmc.loom.api.mappings.layered.spec.LayeredMappingSpecBuilder;
 import net.fabricmc.loom.configuration.DependencyInfo;
 import net.fabricmc.loom.task.AbstractRemapJarTask;
 import net.fabricmc.loom.util.ZipUtils;
@@ -34,6 +36,7 @@ import net.ornithemc.ploceus.mappings.CalamusGen2Provider;
 import net.ornithemc.ploceus.mcp.McpForgeMappingsSpec;
 import net.ornithemc.ploceus.mcp.McpModernMappingsSpec;
 import net.ornithemc.ploceus.nester.NesterProcessor;
+import net.ornithemc.ploceus.nester.NestsMappingSpec;
 import net.ornithemc.ploceus.nester.NestsProvider;
 import net.ornithemc.ploceus.signatures.SignaturePatcherProcessor;
 import net.ornithemc.ploceus.signatures.SigsProvider;
@@ -141,42 +144,55 @@ public class PloceusGradleExtension implements PloceusGradleExtensionApi {
 
 	@Override
 	public Dependency featherMappings(String build) {
-		return project.getDependencies().create(
-			getGeneration().get() == 1
-				? Constants.featherGen1Mappings(minecraftVersion(), side.get(), build)
-				: Constants.featherGen2Mappings(getGeneration().get(), minecraftVersion(), build)
-		);
+		return layeredMappings(builder -> {
+			builder.mappings(project.getDependencies().create(
+				getGeneration().get() == 1
+					? Constants.featherGen1Mappings(minecraftVersion(), side.get(), build)
+					: Constants.featherGen2Mappings(getGeneration().get(), minecraftVersion(), build)
+			));
+		});
 	}
 
 	@Override
-	public McpModernMappingsSpec mcpMappings(String channel, String build) {
+	public Dependency mcpMappings(String channel, String build) {
 		return mcpMappings(channel, DependencyInfo.create(project, Constants.MINECRAFT_CONFIGURATION).getDependency().getVersion(), build);
 	}
 
 	@Override
-	public McpModernMappingsSpec mcpMappings(String channel, String mc, String build) {
-		return new McpModernMappingsSpec(
-			getGeneration().get() == 1
-				? FileSpec.create(String.format(Constants.CALAMUS_GEN1_MAPPINGS, mc))
-				: FileSpec.create(String.format(Constants.CALAMUS_GEN2_MAPPINGS, getGeneration().get(), mc)),
-			FileSpec.create(String.format(Constants.SRG_MAPPINGS, mc)),
-			FileSpec.create(String.format(Constants.MCP_MAPPINGS, channel, build, mc))
-		);
+	public Dependency mcpMappings(String channel, String mc, String build) {
+		return layeredMappings(builder -> {
+			builder.addLayer(new McpModernMappingsSpec(
+				getGeneration().get() == 1
+					? FileSpec.create(String.format(Constants.CALAMUS_GEN1_MAPPINGS, mc))
+					: FileSpec.create(String.format(Constants.CALAMUS_GEN2_MAPPINGS, getGeneration().get(), mc)),
+				FileSpec.create(String.format(Constants.SRG_MAPPINGS, mc)),
+				FileSpec.create(String.format(Constants.MCP_MAPPINGS, channel, build, mc))
+			));
+		});
 	}
 
 	@Override
-	public McpForgeMappingsSpec mcpForgeMappings(String version) {
+	public Dependency mcpForgeMappings(String version) {
 		return mcpForgeMappings(DependencyInfo.create(project, Constants.MINECRAFT_CONFIGURATION).getDependency().getVersion(), version);
 	}
 
 	@Override
-	public McpForgeMappingsSpec mcpForgeMappings(String mc, String version) {
-		return new McpForgeMappingsSpec(
-			getGeneration().get() == 1
-				? FileSpec.create(String.format(Constants.CALAMUS_GEN1_MAPPINGS, mc))
-				: FileSpec.create(String.format(Constants.CALAMUS_GEN2_MAPPINGS, getGeneration().get(), mc)),
-			FileSpec.create(String.format(Constants.FORGE_SRC, mc, version))
-		);
+	public Dependency mcpForgeMappings(String mc, String version) {
+		return layeredMappings(builder -> {
+			builder.addLayer(new McpForgeMappingsSpec(
+				getGeneration().get() == 1
+					? FileSpec.create(String.format(Constants.CALAMUS_GEN1_MAPPINGS, mc))
+					: FileSpec.create(String.format(Constants.CALAMUS_GEN2_MAPPINGS, getGeneration().get(), mc)),
+				FileSpec.create(String.format(Constants.FORGE_SRC, mc, version))
+			));
+		});
+	}
+
+	private Dependency layeredMappings(Action<LayeredMappingSpecBuilder> action) {
+		return loom.layered(builder -> {
+			action.execute(builder);
+			builder.addLayer(new NestsMappingSpec(PloceusGradleExtension.this));
+		});
 	}
 
 	@Override

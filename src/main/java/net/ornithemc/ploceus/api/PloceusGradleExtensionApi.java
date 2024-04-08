@@ -9,13 +9,13 @@ public interface PloceusGradleExtensionApi {
 
 	Dependency featherMappings(String build);
 
-	McpModernMappingsSpec mcpMappings(String channel, String build);
+	Dependency mcpMappings(String channel, String build);
 
-	McpModernMappingsSpec mcpMappings(String channel, String mc, String build);
+	Dependency mcpMappings(String channel, String mc, String build);
 
-	McpForgeMappingsSpec mcpForgeMappings(String version);
+	Dependency mcpForgeMappings(String version);
 
-	McpForgeMappingsSpec mcpForgeMappings(String mc, String version);
+	Dependency mcpForgeMappings(String mc, String version);
 
 	Dependency nests(String build);
 

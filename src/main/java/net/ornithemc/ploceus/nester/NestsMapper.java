@@ -93,7 +93,33 @@ public class NestsMapper {
 			idx++;
 		}
 
-		String name = innerName.substring(0, idx);
-		return idx < innerName.length() ? name + mapClassName(className) : name;
+		String mappedName = mapClassName(className);
+
+		if (idx < innerName.length()) {
+			// local classes have a number prefix
+			String prefix = innerName.substring(0, idx);
+			String simpleName = innerName.substring(idx);
+
+			// make sure the class does not have custom inner name
+			if (className.endsWith(simpleName)) {
+				// inner name is full name with package stripped
+				// so translate that
+				innerName = prefix + mappedName.substring(mappedName.lastIndexOf('/') + 1);
+			}
+		} else {
+			// anonymous class
+			String simpleName = mappedName.substring(mappedName.lastIndexOf('/') + 1);
+
+			if (simpleName.startsWith("C_")) {
+				// mapped name is Calamus intermediary format C_<number>
+				// we strip the C_ prefix and keep the number as the inner name
+				return simpleName.substring(2);
+			} else {
+				// keep the inner name given by the nests file
+				return innerName;
+			}
+		}
+
+		return innerName;
 	}
 }

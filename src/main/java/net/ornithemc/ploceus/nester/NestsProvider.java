@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.EnumMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -30,19 +32,19 @@ public class NestsProvider {
 	final PloceusGradleExtension ploceus;
 	final String configuration;
 	final MappingsNamespace sourceNamespace;
-	final MappingsNamespace targetNamespace;
 
 	Path nestsPath;
 	Nests nests;
-	Nests mappedNests;
+	Map<MappingsNamespace, Nests> mappedNests;
 
-	private NestsProvider(Project project, LoomGradleExtension loom, PloceusGradleExtension ploceus, String configuration, MappingsNamespace sourceNamespace, MappingsNamespace targetNamespace) {
+	private NestsProvider(Project project, LoomGradleExtension loom, PloceusGradleExtension ploceus, String configuration, MappingsNamespace sourceNamespace) {
 		this.project = project;
 		this.loom = loom;
 		this.ploceus = ploceus;
 		this.configuration = configuration;
 		this.sourceNamespace = sourceNamespace;
-		this.targetNamespace = targetNamespace;
+
+		this.mappedNests = new EnumMap<>(MappingsNamespace.class);
 	}
 
 	@Override
@@ -83,23 +85,23 @@ public class NestsProvider {
 		return nestsPath != null;
 	}
 
-	public Nests get(MappingTree mappings, boolean mapped) {
+	public Nests get(MappingTree mappings, MappingsNamespace ns) {
 		if (isPresent()) {
 			if (nests == null) {
 				nests = Nests.of(nestsPath);
 			}
-			if (mapped && mappedNests == null) {
-				mappedNests = new NestsMapper(mappings).apply(nests, sourceNamespace, targetNamespace);
+			if (ns != sourceNamespace && !mappedNests.containsKey(ns)) {
+				mappedNests.put(ns, new NestsMapper(mappings).apply(nests, sourceNamespace, ns));
 			}
 		}
 
-		return mapped ? mappedNests : nests;
+		return ns == sourceNamespace ? nests : mappedNests.get(ns);
 	}
 
 	public static class Simple extends NestsProvider {
 
 		public Simple(Project project, LoomGradleExtension loom, PloceusGradleExtension ploceus) {
-			super(project, loom, ploceus, Constants.NESTS_CONFIGURATION, MappingsNamespace.OFFICIAL, MappingsNamespace.NAMED);
+			super(project, loom, ploceus, Constants.NESTS_CONFIGURATION, MappingsNamespace.OFFICIAL);
 		}
 	}
 
@@ -109,10 +111,10 @@ public class NestsProvider {
 		private final NestsProvider server;
 
 		public Split(Project project, LoomGradleExtension loom, PloceusGradleExtension ploceus) {
-			super(project, loom, ploceus, null, MappingsNamespace.INTERMEDIARY, MappingsNamespace.NAMED);
+			super(project, loom, ploceus, null, MappingsNamespace.INTERMEDIARY);
 
-			this.client = new NestsProvider(project, loom, ploceus, Constants.CLIENT_NESTS_CONFIGURATION, MappingsNamespace.CLIENT_OFFICIAL, MappingsNamespace.INTERMEDIARY);
-			this.server = new NestsProvider(project, loom, ploceus, Constants.SERVER_NESTS_CONFIGURATION, MappingsNamespace.SERVER_OFFICIAL, MappingsNamespace.INTERMEDIARY);
+			this.client = new NestsProvider(project, loom, ploceus, Constants.CLIENT_NESTS_CONFIGURATION, MappingsNamespace.CLIENT_OFFICIAL);
+			this.server = new NestsProvider(project, loom, ploceus, Constants.SERVER_NESTS_CONFIGURATION, MappingsNamespace.SERVER_OFFICIAL);
 		}
 
 		@Override
@@ -131,20 +133,30 @@ public class NestsProvider {
 			return client.isPresent() || server.isPresent();
 		}
 
-		public Nests get(MappingTree mappings, boolean mapped) {
+		@Override
+		public Nests get(MappingTree mappings, MappingsNamespace ns) {
 			if (isPresent()) {
 				if (nests == null) {
-					Nests clientNests = client.get(mappings, true);
-					Nests serverNests = server.get(mappings, true);
+					if (client.isPresent() && server.isPresent()) {
+						Nests clientNests = client.get(mappings, MappingsNamespace.INTERMEDIARY);
+						Nests serverNests = server.get(mappings, MappingsNamespace.INTERMEDIARY);
 
-					nests = mergeNests(clientNests, serverNests);
+						nests = mergeNests(clientNests, serverNests);
+					} else {
+						if (client.isPresent()) {
+							nests = client.get(mappings, MappingsNamespace.INTERMEDIARY);
+						}
+						if (server.isPresent()) {
+							nests = server.get(mappings, MappingsNamespace.INTERMEDIARY);
+						}
+					}
 				}
-				if (mapped && mappedNests == null) {
-					mappedNests = new NestsMapper(mappings).apply(nests, sourceNamespace, targetNamespace);
+				if (ns != sourceNamespace && !mappedNests.containsKey(ns)) {
+					mappedNests.put(ns, new NestsMapper(mappings).apply(nests, sourceNamespace, ns));
 				}
 			}
 
-			return mapped ? mappedNests : nests;
+			return ns == sourceNamespace ? nests : mappedNests.get(ns);
 		}
 
 		private Nests mergeNests(Nests client, Nests server) {
