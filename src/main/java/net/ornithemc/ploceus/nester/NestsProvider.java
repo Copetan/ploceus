@@ -24,6 +24,7 @@ import net.ornithemc.nester.nest.Nest;
 import net.ornithemc.nester.nest.Nests;
 import net.ornithemc.ploceus.Constants;
 import net.ornithemc.ploceus.PloceusGradleExtension;
+import net.ornithemc.ploceus.api.GameSide;
 
 public class NestsProvider {
 
@@ -102,6 +103,13 @@ public class NestsProvider {
 
 		public Simple(Project project, LoomGradleExtension loom, PloceusGradleExtension ploceus) {
 			super(project, loom, ploceus, Constants.NESTS_CONFIGURATION, MappingsNamespace.OFFICIAL);
+		}
+	}
+
+	public static class Legacy extends NestsProvider {
+
+		public Legacy(Project project, LoomGradleExtension loom, PloceusGradleExtension ploceus, GameSide side) {
+			super(project, loom, ploceus, Constants.NESTS_CONFIGURATION, side == GameSide.CLIENT ? MappingsNamespace.CLIENT_OFFICIAL : MappingsNamespace.SERVER_OFFICIAL);
 		}
 	}
 

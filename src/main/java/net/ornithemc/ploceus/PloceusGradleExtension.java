@@ -65,11 +65,13 @@ public class PloceusGradleExtension implements PloceusGradleExtensionApi {
 		this.commonLibraries = new CommonLibraries(this.project, this);
 		this.nestsProvider = project.getObjects().property(NestsProvider.class);
 		this.nestsProvider.convention(project.provider(() -> {
-			int generation = getGeneration().get();
-
 			NestsProvider provider;
-			if (generation > 1 && loom.getMinecraftProvider().isLegacyVersion()) {
-				provider = new NestsProvider.Split(project, loom, this);
+			if (loom.getMinecraftProvider().isLegacyVersion()) {
+				if (getGeneration().get() == 1) {
+					provider = new NestsProvider.Legacy(project, loom, this, getSide().get());
+				} else {
+					provider = new NestsProvider.Split(project, loom, this);
+				}
 			} else {
 				provider = new NestsProvider.Simple(project, loom, this);
 			}
@@ -118,7 +120,7 @@ public class PloceusGradleExtension implements PloceusGradleExtensionApi {
                             Manifest manifest = new Manifest(new ByteArrayInputStream(bytes));
 
                             Attributes attributes = manifest.getMainAttributes();
-                            attributes.putValue(Constants.CALAMUS_GENERATION_ATTRIBUTE, getGeneration().get().toString());
+                            attributes.putValue(Constants.CALAMUS_GENERATION_ATTRIBUTE, generation.get().toString());
 
                             ByteArrayOutputStream out = new ByteArrayOutputStream();
                             manifest.write(out);
@@ -146,9 +148,9 @@ public class PloceusGradleExtension implements PloceusGradleExtensionApi {
 	public Dependency featherMappings(String build) {
 		return layeredMappings(builder -> {
 			builder.mappings(project.getDependencies().create(
-				getGeneration().get() == 1
+				generation.get() == 1
 					? Constants.featherGen1Mappings(minecraftVersion(), side.get(), build)
-					: Constants.featherGen2Mappings(getGeneration().get(), minecraftVersion(), build)
+					: Constants.featherGen2Mappings(generation.get(), minecraftVersion(), build)
 			));
 		});
 	}
@@ -162,9 +164,9 @@ public class PloceusGradleExtension implements PloceusGradleExtensionApi {
 	public Dependency mcpMappings(String channel, String mc, String build) {
 		return layeredMappings(builder -> {
 			builder.addLayer(new McpModernMappingsSpec(
-				getGeneration().get() == 1
-					? FileSpec.create(String.format(Constants.CALAMUS_GEN1_MAPPINGS, mc))
-					: FileSpec.create(String.format(Constants.CALAMUS_GEN2_MAPPINGS, getGeneration().get(), mc)),
+				generation.get() == 1
+					? FileSpec.create(Constants.calamusGen1Mappings(mc, side.get()))
+					: FileSpec.create(Constants.calamusGen2Mappings(mc, generation.get())),
 				FileSpec.create(String.format(Constants.SRG_MAPPINGS, mc)),
 				FileSpec.create(String.format(Constants.MCP_MAPPINGS, channel, build, mc))
 			));
@@ -180,9 +182,9 @@ public class PloceusGradleExtension implements PloceusGradleExtensionApi {
 	public Dependency mcpForgeMappings(String mc, String version) {
 		return layeredMappings(builder -> {
 			builder.addLayer(new McpForgeMappingsSpec(
-				getGeneration().get() == 1
-					? FileSpec.create(String.format(Constants.CALAMUS_GEN1_MAPPINGS, mc))
-					: FileSpec.create(String.format(Constants.CALAMUS_GEN2_MAPPINGS, getGeneration().get(), mc)),
+				generation.get() == 1
+					? FileSpec.create(Constants.calamusGen1Mappings(mc, side.get()))
+					: FileSpec.create(Constants.calamusGen2Mappings(mc, generation.get())),
 				FileSpec.create(String.format(Constants.FORGE_SRC, mc, version))
 			));
 		});
@@ -191,13 +193,13 @@ public class PloceusGradleExtension implements PloceusGradleExtensionApi {
 	private Dependency layeredMappings(Action<LayeredMappingSpecBuilder> action) {
 		return loom.layered(builder -> {
 			action.execute(builder);
-			builder.addLayer(new NestsMappingSpec(PloceusGradleExtension.this));
+			builder.addLayer(new NestsMappingSpec(this));
 		});
 	}
 
 	@Override
 	public Dependency nests(String build) {
-		return nests(build, getGeneration().get() == 1 ? side.get() : GameSide.MERGED);
+		return nests(build, generation.get() == 1 ? side.get() : GameSide.MERGED);
 	}
 
 	@Override
@@ -212,7 +214,7 @@ public class PloceusGradleExtension implements PloceusGradleExtensionApi {
 
 	@Override
 	public Dependency sparrow(String build) {
-		return sparrow(build, getGeneration().get() == 1 ? side.get() : GameSide.MERGED);
+		return sparrow(build, generation.get() == 1 ? side.get() : GameSide.MERGED);
 	}
 
 	@Override
@@ -346,6 +348,10 @@ public class PloceusGradleExtension implements PloceusGradleExtensionApi {
 				.finalizeValueOnRead();
 			provider.getRefreshDeps().set(project.provider(() -> LoomGradleExtension.get(project).refreshDeps()));
 		});
+	}
+
+	public Property<GameSide> getSide() {
+		return side;
 	}
 
 	public Property<Integer> getGeneration() {

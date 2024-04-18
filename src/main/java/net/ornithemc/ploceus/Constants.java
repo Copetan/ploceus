@@ -26,11 +26,21 @@ public class Constants {
 	public static final String VERSION_MANIFEST_URL = "https://skyrising.github.io/mc-versions/version_manifest.json";
 
 	public static final String CALAMUS_INTERMEDIARY_MAVEN_GROUP = "net.ornithemc";
-	public static final String CALAMUS_GEN1_MAPPINGS = CALAMUS_INTERMEDIARY_MAVEN_GROUP + ":calamus-intermediary:%s";
+	public static String calamusGen1Mappings(GameSide side) {
+		return CALAMUS_INTERMEDIARY_MAVEN_GROUP + ":calamus-intermediary:%1$s" + side.suffix() + ":v2";
+	}
+	public static String calamusGen1Mappings(String mc, GameSide side) {
+		return calamusGen1Mappings(side).formatted(mc);
+	}
 	public static String calamusGen1Url(GameSide side) {
 		return MAVEN_URL + "/net/ornithemc/calamus-intermediary/%1$s" + side.suffix() + "/calamus-intermediary-%1$s" + side.suffix() + "-v2.jar";
 	}
-	public static final String CALAMUS_GEN2_MAPPINGS = CALAMUS_INTERMEDIARY_MAVEN_GROUP + ":calamus-intermediary-gen%d:%s";
+	public static String calamusGen2Mappings(int generation) {
+		return CALAMUS_INTERMEDIARY_MAVEN_GROUP + ":calamus-intermediary-gen" + generation + ":%1$s:v2";
+	}
+	public static String calamusGen2Mappings(String mc, int generation) {
+		return calamusGen2Mappings(generation).formatted(mc);
+	}
 	public static String calamusGen2Url(int generation) {
 		return MAVEN_URL + "/net/ornithemc/calamus-intermediary-gen" + generation + "/%1$s/calamus-intermediary-gen" + generation + "-%1$s-v2.jar";
 	}
