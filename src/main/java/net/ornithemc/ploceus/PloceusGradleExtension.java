@@ -107,31 +107,32 @@ public class PloceusGradleExtension implements PloceusGradleExtensionApi {
 		project.getConfigurations().register(Constants.SIGNATURES_CONFIGURATION);
 		project.getConfigurations().register(Constants.CLIENT_SIGNATURES_CONFIGURATION);
 		project.getConfigurations().register(Constants.SERVER_SIGNATURES_CONFIGURATION);
-		project.getExtensions().getExtraProperties().set(Constants.VERSION_MANIFEST_PROPERTY, Constants.VERSION_MANIFEST_URL);
 
+		loom.getVersionsManifests().add(Constants.VERSIONS_MANIFEST_URL, -10);
 		loom.addMinecraftJarProcessor(NesterProcessor.class, this);
 		loom.addMinecraftJarProcessor(SignaturePatcherProcessor.class, this);
 
 		project.getTasks().configureEach(task -> {
-            if (task instanceof AbstractRemapJarTask remapJarTask) {
-                remapJarTask.doLast(task1 -> {
-                    try {
-                        ZipUtils.transform(remapJarTask.getArchiveFile().get().getAsFile().toPath(), Map.of(Constants.MANIFEST_PATH, bytes -> {
-                            Manifest manifest = new Manifest(new ByteArrayInputStream(bytes));
+			if (task instanceof AbstractRemapJarTask remapJarTask) {
+				remapJarTask.doLast(task1 -> {
+					try {
+						ZipUtils.transform(remapJarTask.getArchiveFile().get().getAsFile().toPath(), Map.of(Constants.MANIFEST_PATH, bytes -> {
+							Manifest manifest = new Manifest(new ByteArrayInputStream(bytes));
 
-                            Attributes attributes = manifest.getMainAttributes();
-                            attributes.putValue(Constants.CALAMUS_GENERATION_ATTRIBUTE, generation.get().toString());
+							Attributes attributes = manifest.getMainAttributes();
+							attributes.putValue(Constants.CALAMUS_GENERATION_ATTRIBUTE, generation.get().toString());
 
-                            ByteArrayOutputStream out = new ByteArrayOutputStream();
-                            manifest.write(out);
-                            return out.toByteArray();
-                        }));
-                    } catch (IOException e) {
-                        throw new UncheckedIOException("unable to transform remapped jar manifest!", e);
-                    }
-                });
-            }
-        });
+							ByteArrayOutputStream out = new ByteArrayOutputStream();
+							manifest.write(out);
+
+							return out.toByteArray();
+						}));
+					} catch (IOException e) {
+						throw new UncheckedIOException("unable to transform remapped jar manifest!", e);
+					}
+				});
+			}
+		});
 
 		calamusGen1Provider();
 	}
@@ -377,15 +378,12 @@ public class PloceusGradleExtension implements PloceusGradleExtensionApi {
 		// the normalized version id can be parsed from the version details file
 
 		String versionId = minecraftVersion();
+		String manifestHash = Integer.toHexString(Constants.VERSIONS_MANIFEST_URL.hashCode());
 
 		Path userCache = loom.getFiles().getUserCache().toPath();
-		Path manifestCache = userCache.resolve("skyrising_version_manifest.json");
+		Path manifestCache = userCache.resolve("versions_manifest-" + manifestHash + ".json");
 
 		try {
-			if (!Files.exists(manifestCache)) {
-				loom.download(Constants.VERSION_MANIFEST_URL).downloadPath(manifestCache);
-			}
-
 			try (BufferedReader br = new BufferedReader(new FileReader(manifestCache.toFile()))) {
 				VersionsManifest manifest = GSON.fromJson(br, VersionsManifest.class);
 				VersionsManifest.Version version = manifest.getVersion(versionId);

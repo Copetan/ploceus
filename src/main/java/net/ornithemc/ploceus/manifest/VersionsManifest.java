@@ -8,6 +8,6 @@ public record VersionsManifest(List<Version> versions) {
 	}
 
 	public Version getVersion(String id) {
-		return versions.stream().filter(version -> version.id.equalsIgnoreCase(id)).findFirst().orElse(null);
+		return versions.stream().filter(version -> version.id.equalsIgnoreCase(id)).findFirst().orElseThrow();
 	}
 }
