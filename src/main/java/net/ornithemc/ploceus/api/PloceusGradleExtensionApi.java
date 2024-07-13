@@ -2,9 +2,6 @@ package net.ornithemc.ploceus.api;
 
 import org.gradle.api.artifacts.Dependency;
 
-import net.ornithemc.ploceus.mcp.McpForgeMappingsSpec;
-import net.ornithemc.ploceus.mcp.McpModernMappingsSpec;
-
 public interface PloceusGradleExtensionApi {
 
 	Dependency featherMappings(String build);
@@ -17,17 +14,23 @@ public interface PloceusGradleExtensionApi {
 
 	Dependency mcpForgeMappings(String mc, String version);
 
-	Dependency nests(String build);
+	Dependency raven(String build);
 
-	Dependency nests(String build, String side);
+	Dependency raven(String build, String side);
 
-	Dependency nests(String build, GameSide side);
+	Dependency raven(String build, GameSide side);
 
 	Dependency sparrow(String build);
 
 	Dependency sparrow(String build, String side);
 
 	Dependency sparrow(String build, GameSide side);
+
+	Dependency nests(String build);
+
+	Dependency nests(String build, String side);
+
+	Dependency nests(String build, GameSide side);
 
 	void dependOsl(String version) throws Exception;
 

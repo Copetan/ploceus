@@ -53,7 +53,7 @@ public class NesterProcessor implements MinecraftJarProcessor<NesterProcessor.Sp
 				remap(false);
 			Nester.nestJar(options, tmp, jar, nests);
 		} catch (IOException e) {
-			throw new RuntimeException("failed to apply nests to jar!", e);
+			throw new IOException("failed to apply nests to jar!", e);
 		}
 	}
 

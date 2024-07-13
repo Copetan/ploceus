@@ -29,6 +29,8 @@ import net.fabricmc.loom.util.ZipUtils;
 
 import net.ornithemc.ploceus.api.GameSide;
 import net.ornithemc.ploceus.api.PloceusGradleExtensionApi;
+import net.ornithemc.ploceus.exceptions.ExceptionPatcherProcessor;
+import net.ornithemc.ploceus.exceptions.ExceptionsProvider;
 import net.ornithemc.ploceus.manifest.VersionDetails;
 import net.ornithemc.ploceus.manifest.VersionsManifest;
 import net.ornithemc.ploceus.mappings.CalamusGen1Provider;
@@ -39,7 +41,7 @@ import net.ornithemc.ploceus.nester.NesterProcessor;
 import net.ornithemc.ploceus.nester.NestsMappingSpec;
 import net.ornithemc.ploceus.nester.NestsProvider;
 import net.ornithemc.ploceus.signatures.SignaturePatcherProcessor;
-import net.ornithemc.ploceus.signatures.SigsProvider;
+import net.ornithemc.ploceus.signatures.SignaturesProvider;
 
 public class PloceusGradleExtension implements PloceusGradleExtensionApi {
 
@@ -53,8 +55,9 @@ public class PloceusGradleExtension implements PloceusGradleExtensionApi {
 	private final LoomGradleExtension loom;
 	private final OslVersionCache oslVersions;
 	private final CommonLibraries commonLibraries;
+	private final Property<ExceptionsProvider> exceptionsProvider;
+	private final Property<SignaturesProvider> signaturesProvider;
 	private final Property<NestsProvider> nestsProvider;
-	private final Property<SigsProvider> sigsProvider;
 	private final Property<GameSide> side; // gen 1
 	private final Property<Integer> generation; // gen 2+
 
@@ -63,6 +66,30 @@ public class PloceusGradleExtension implements PloceusGradleExtensionApi {
 		this.loom = LoomGradleExtension.get(this.project);
 		this.oslVersions = new OslVersionCache(this.project, this);
 		this.commonLibraries = new CommonLibraries(this.project, this);
+		this.exceptionsProvider = project.getObjects().property(ExceptionsProvider.class);
+		this.exceptionsProvider.convention(project.provider(() -> {
+			ExceptionsProvider provider;
+			if (loom.getMinecraftProvider().isLegacyVersion()) {
+				provider = new ExceptionsProvider.Split(project, loom, this);
+			} else {
+				provider = new ExceptionsProvider.Simple(project, loom, this);
+			}
+			provider.provide();
+
+			return provider;
+		}));
+		this.signaturesProvider = project.getObjects().property(SignaturesProvider.class);
+		this.signaturesProvider.convention(project.provider(() -> {
+			SignaturesProvider provider;
+			if (loom.getMinecraftProvider().isLegacyVersion()) {
+				provider = new SignaturesProvider.Split(project, loom, this);
+			} else {
+				provider = new SignaturesProvider.Simple(project, loom, this);
+			}
+			provider.provide();
+
+			return provider;
+		}));
 		this.nestsProvider = project.getObjects().property(NestsProvider.class);
 		this.nestsProvider.convention(project.provider(() -> {
 			NestsProvider provider;
@@ -79,18 +106,6 @@ public class PloceusGradleExtension implements PloceusGradleExtensionApi {
 
 			return provider;
 		}));
-		this.sigsProvider = project.getObjects().property(SigsProvider.class);
-		this.sigsProvider.convention(project.provider(() -> {
-			SigsProvider provider;
-			if (loom.getMinecraftProvider().isLegacyVersion()) {
-				provider = new SigsProvider.Split(project, loom, this);
-			} else {
-				provider = new SigsProvider.Simple(project, loom, this);
-			}
-			provider.provide();
-
-			return provider;
-		}));
 		this.nestsProvider.finalizeValueOnRead();
 		this.side = project.getObjects().property(GameSide.class);
 		this.side.convention(GameSide.MERGED);
@@ -101,16 +116,20 @@ public class PloceusGradleExtension implements PloceusGradleExtensionApi {
 	}
 
 	private void apply() {
-		project.getConfigurations().register(Constants.NESTS_CONFIGURATION);
-		project.getConfigurations().register(Constants.CLIENT_NESTS_CONFIGURATION);
-		project.getConfigurations().register(Constants.SERVER_NESTS_CONFIGURATION);
+		project.getConfigurations().register(Constants.EXCEPTIONS_CONFIGURATION);
+		project.getConfigurations().register(Constants.CLIENT_EXCEPTIONS_CONFIGURATION);
+		project.getConfigurations().register(Constants.SERVER_EXCEPTIONS_CONFIGURATION);
 		project.getConfigurations().register(Constants.SIGNATURES_CONFIGURATION);
 		project.getConfigurations().register(Constants.CLIENT_SIGNATURES_CONFIGURATION);
 		project.getConfigurations().register(Constants.SERVER_SIGNATURES_CONFIGURATION);
+		project.getConfigurations().register(Constants.NESTS_CONFIGURATION);
+		project.getConfigurations().register(Constants.CLIENT_NESTS_CONFIGURATION);
+		project.getConfigurations().register(Constants.SERVER_NESTS_CONFIGURATION);
 
 		loom.getVersionsManifests().add(Constants.VERSIONS_MANIFEST_URL, -10);
-		loom.addMinecraftJarProcessor(NesterProcessor.class, this);
+		loom.addMinecraftJarProcessor(ExceptionPatcherProcessor.class, this);
 		loom.addMinecraftJarProcessor(SignaturePatcherProcessor.class, this);
+		loom.addMinecraftJarProcessor(NesterProcessor.class, this);
 
 		project.getTasks().configureEach(task -> {
 			if (task instanceof AbstractRemapJarTask remapJarTask) {
@@ -137,12 +156,16 @@ public class PloceusGradleExtension implements PloceusGradleExtensionApi {
 		calamusGen1Provider();
 	}
 
-	public NestsProvider getNestsProvider() {
-		return nestsProvider.get();
+	public ExceptionsProvider getExceptionsProvider() {
+		return exceptionsProvider.get();
 	}
 
-	public SigsProvider getSigsProvider() {
-		return sigsProvider.get();
+	public SignaturesProvider getSignaturesProvider() {
+		return signaturesProvider.get();
+	}
+
+	public NestsProvider getNestsProvider() {
+		return nestsProvider.get();
 	}
 
 	@Override
@@ -199,18 +222,18 @@ public class PloceusGradleExtension implements PloceusGradleExtensionApi {
 	}
 
 	@Override
-	public Dependency nests(String build) {
-		return nests(build, generation.get() == 1 ? side.get() : GameSide.MERGED);
+	public Dependency raven(String build) {
+		return raven(build, generation.get() == 1 ? side.get() : GameSide.MERGED);
 	}
 
 	@Override
-	public Dependency nests(String build, String side) {
-		return nests(build, GameSide.of(side));
+	public Dependency raven(String build, String side) {
+		return raven(build, GameSide.of(side));
 	}
 
 	@Override
-	public Dependency nests(String build, GameSide side) {
-		return project.getDependencies().create(Constants.nests(minecraftVersion(), side, build));
+	public Dependency raven(String build, GameSide side) {
+		return project.getDependencies().create(Constants.raven(minecraftVersion(), side, build));
 	}
 
 	@Override
@@ -226,6 +249,21 @@ public class PloceusGradleExtension implements PloceusGradleExtensionApi {
 	@Override
 	public Dependency sparrow(String build, GameSide side) {
 		return project.getDependencies().create(Constants.sparrow(minecraftVersion(), side, build));
+	}
+
+	@Override
+	public Dependency nests(String build) {
+		return nests(build, generation.get() == 1 ? side.get() : GameSide.MERGED);
+	}
+
+	@Override
+	public Dependency nests(String build, String side) {
+		return nests(build, GameSide.of(side));
+	}
+
+	@Override
+	public Dependency nests(String build, GameSide side) {
+		return project.getDependencies().create(Constants.nests(minecraftVersion(), side, build));
 	}
 
 	@Override

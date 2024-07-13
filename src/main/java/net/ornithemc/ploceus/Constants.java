@@ -15,12 +15,15 @@ public class Constants {
 	public static final String FORGE_MAVEN_URL = "https://maven.minecraftforge.net/";
 
 	public static final String MINECRAFT_CONFIGURATION = "minecraft";
-	public static final String NESTS_CONFIGURATION = "nests";
-	public static final String CLIENT_NESTS_CONFIGURATION = "clientNests";
-	public static final String SERVER_NESTS_CONFIGURATION = "serverNests";
+	public static final String EXCEPTIONS_CONFIGURATION = "exceptions";
+	public static final String CLIENT_EXCEPTIONS_CONFIGURATION = "clientExceptions";
+	public static final String SERVER_EXCEPTIONS_CONFIGURATION = "serverExceptions";
 	public static final String SIGNATURES_CONFIGURATION = "signatures";
 	public static final String CLIENT_SIGNATURES_CONFIGURATION = "clientSignatures";
 	public static final String SERVER_SIGNATURES_CONFIGURATION = "serverSignatures";
+	public static final String NESTS_CONFIGURATION = "nests";
+	public static final String CLIENT_NESTS_CONFIGURATION = "clientNests";
+	public static final String SERVER_NESTS_CONFIGURATION = "serverNests";
 
 	public static final String VERSION_MANIFEST_PROPERTY = "loom_version_manifests";
 	public static final String VERSIONS_MANIFEST_URL = "https://skyrising.github.io/mc-versions/version_manifest.json";
@@ -55,16 +58,22 @@ public class Constants {
 		return String.format(FEATHER_GEN2_MAPPINGS, generation, mc, build);
 	}
 
-	public static final String NESTS_MAVEN_GROUP = "net.ornithemc";
-	public static final String NESTS = NESTS_MAVEN_GROUP + ":nests:%s%s+build.%s";
-	public static String nests(String mc, GameSide side, String build) {
-		return String.format(NESTS, mc, side.suffix(), build);
+	public static final String RAVEN_MAVEN_GROUP = "net.ornithemc";
+	public static final String RAVEN = RAVEN_MAVEN_GROUP + ":raven:%s%s+build.%s";
+	public static String raven(String mc, GameSide side, String build) {
+		return String.format(RAVEN, mc, side.suffix(), build);
 	}
 
 	public static final String SPARROW_MAVEN_GROUP = "net.ornithemc";
 	public static final String SPARROW = SPARROW_MAVEN_GROUP + ":sparrow:%s%s+build.%s";
 	public static String sparrow(String mc, GameSide side, String build) {
 		return String.format(SPARROW, mc, side.suffix(), build);
+	}
+
+	public static final String NESTS_MAVEN_GROUP = "net.ornithemc";
+	public static final String NESTS = NESTS_MAVEN_GROUP + ":nests:%s%s+build.%s";
+	public static String nests(String mc, GameSide side, String build) {
+		return String.format(NESTS, mc, side.suffix(), build);
 	}
 
 	public static final String MANIFEST_PATH = "META-INF/MANIFEST.MF";

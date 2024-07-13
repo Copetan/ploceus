@@ -15,6 +15,7 @@ import io.github.gaming32.signaturechanger.cli.SignatureChangerCli;
 import io.github.gaming32.signaturechanger.tree.SigsClass;
 import io.github.gaming32.signaturechanger.tree.SigsFile;
 
+import net.fabricmc.loom.api.mappings.layered.MappingsNamespace;
 import net.fabricmc.loom.api.processor.MinecraftJarProcessor;
 import net.fabricmc.loom.api.processor.ProcessorContext;
 import net.fabricmc.loom.api.processor.SpecContext;
@@ -38,7 +39,7 @@ public class SignaturePatcherProcessor implements MinecraftJarProcessor<Signatur
 
 	@Override
 	public Spec buildSpec(SpecContext context) {
-		SigsProvider sigs = ploceus.getSigsProvider();
+		SignaturesProvider sigs = ploceus.getSignaturesProvider();
 		return sigs.isPresent() ? new Spec(sigs) : null;
 	}
 
@@ -46,7 +47,7 @@ public class SignaturePatcherProcessor implements MinecraftJarProcessor<Signatur
 	public void processJar(Path jar, Spec spec, ProcessorContext ctx) throws IOException {
 		try {
 			MappingTree mappings = ctx.getMappings();
-			SigsFile sigs = ploceus.getSigsProvider().get(mappings, true);
+			SigsFile sigs = ploceus.getSignaturesProvider().get(mappings, MappingsNamespace.NAMED);
 			SignatureApplier applier = new SignatureApplier(sigs);
 
 			SignatureChangerCli.iterateClasses(
@@ -73,18 +74,18 @@ public class SignaturePatcherProcessor implements MinecraftJarProcessor<Signatur
 				}
 			);
 		} catch (IOException e) {
-			throw new RuntimeException("failed to patch signatures!", e);
+			throw new IOException("failed to patch signatures!", e);
 		}
 	}
 
 	public static class Spec implements MinecraftJarProcessor.Spec {
 
-		private final SigsProvider sigs;
+		private final SignaturesProvider sigs;
 
 		private Integer hashCode;
 
-		public Spec(SigsProvider nests) {
-			this.sigs = nests;
+		public Spec(SignaturesProvider sigs) {
+			this.sigs = sigs;
 		}
 
 		@Override
