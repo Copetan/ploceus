@@ -10,6 +10,6 @@ public abstract class CalamusGen2Provider extends IntermediaryMappingsProvider {
 
 	@Override
 	public String getName() {
-		return "calamus-gen" + getGeneration().get() + "-" + super.getName();
+		return "calamus-gen" + getGeneration().get() + "-" + NAME;
 	}
 }
