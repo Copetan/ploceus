@@ -424,12 +424,18 @@ public class PloceusGradleExtension implements PloceusGradleExtensionApi {
 		// the normalized version id can be parsed from the version details file
 
 		String versionId = minecraftVersion();
-		String manifestHash = Integer.toHexString(Constants.VERSIONS_MANIFEST_URL.hashCode());
+
+		String manifestUrl = Constants.VERSIONS_MANIFEST_URL;
+		String manifestHash = Integer.toHexString(manifestUrl.hashCode());
 
 		Path userCache = loom.getFiles().getUserCache().toPath();
 		Path manifestCache = userCache.resolve("versions_manifest-" + manifestHash + ".json");
 
 		try {
+			if (!Files.exists(manifestCache)) {
+				loom.download(manifestUrl).downloadPath(manifestCache);
+			}
+
 			try (BufferedReader br = new BufferedReader(new FileReader(manifestCache.toFile()))) {
 				VersionsManifest manifest = GSON.fromJson(br, VersionsManifest.class);
 				VersionsManifest.Version version = manifest.getVersion(versionId);
