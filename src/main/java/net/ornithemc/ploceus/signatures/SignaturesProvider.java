@@ -27,6 +27,7 @@ import net.fabricmc.mappingio.tree.MappingTree;
 import net.ornithemc.mappingutils.MappingUtils;
 import net.ornithemc.ploceus.Constants;
 import net.ornithemc.ploceus.PloceusGradleExtension;
+import net.ornithemc.ploceus.api.GameSide;
 
 public class SignaturesProvider {
 
@@ -110,6 +111,13 @@ public class SignaturesProvider {
 
 		public Simple(Project project, LoomGradleExtension loom, PloceusGradleExtension ploceus) {
 			super(project, loom, ploceus, Constants.SIGNATURES_CONFIGURATION, MappingsNamespace.OFFICIAL);
+		}
+	}
+
+	public static class Legacy extends SignaturesProvider {
+
+		public Legacy(Project project, LoomGradleExtension loom, PloceusGradleExtension ploceus, GameSide side) {
+			super(project, loom, ploceus, Constants.SIGNATURES_CONFIGURATION, side == GameSide.CLIENT ? MappingsNamespace.CLIENT_OFFICIAL : MappingsNamespace.SERVER_OFFICIAL);
 		}
 	}
 

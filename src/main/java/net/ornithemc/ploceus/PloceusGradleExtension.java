@@ -70,7 +70,11 @@ public class PloceusGradleExtension implements PloceusGradleExtensionApi {
 		this.exceptionsProvider.convention(project.provider(() -> {
 			ExceptionsProvider provider;
 			if (loom.getMinecraftProvider().isLegacyVersion()) {
-				provider = new ExceptionsProvider.Split(project, loom, this);
+				if (getGeneration().get() == 1) {
+					provider = new ExceptionsProvider.Legacy(project, loom, this, getSide().get());
+				} else {
+					provider = new ExceptionsProvider.Split(project, loom, this);
+				}
 			} else {
 				provider = new ExceptionsProvider.Simple(project, loom, this);
 			}
@@ -82,7 +86,11 @@ public class PloceusGradleExtension implements PloceusGradleExtensionApi {
 		this.signaturesProvider.convention(project.provider(() -> {
 			SignaturesProvider provider;
 			if (loom.getMinecraftProvider().isLegacyVersion()) {
-				provider = new SignaturesProvider.Split(project, loom, this);
+				if (getGeneration().get() == 1) {
+					provider = new SignaturesProvider.Legacy(project, loom, this, getSide().get());
+				} else {
+					provider = new SignaturesProvider.Split(project, loom, this);
+				}
 			} else {
 				provider = new SignaturesProvider.Simple(project, loom, this);
 			}

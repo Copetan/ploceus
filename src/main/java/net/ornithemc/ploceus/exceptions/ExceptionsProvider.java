@@ -26,6 +26,7 @@ import net.ornithemc.exceptor.io.ExceptorIo;
 import net.ornithemc.mappingutils.MappingUtils;
 import net.ornithemc.ploceus.Constants;
 import net.ornithemc.ploceus.PloceusGradleExtension;
+import net.ornithemc.ploceus.api.GameSide;
 
 public class ExceptionsProvider {
 
@@ -109,6 +110,13 @@ public class ExceptionsProvider {
 
 		public Simple(Project project, LoomGradleExtension loom, PloceusGradleExtension ploceus) {
 			super(project, loom, ploceus, Constants.EXCEPTIONS_CONFIGURATION, MappingsNamespace.OFFICIAL);
+		}
+	}
+
+	public static class Legacy extends ExceptionsProvider {
+
+		public Legacy(Project project, LoomGradleExtension loom, PloceusGradleExtension ploceus, GameSide side) {
+			super(project, loom, ploceus, Constants.EXCEPTIONS_CONFIGURATION, side == GameSide.CLIENT ? MappingsNamespace.CLIENT_OFFICIAL : MappingsNamespace.SERVER_OFFICIAL);
 		}
 	}
 
