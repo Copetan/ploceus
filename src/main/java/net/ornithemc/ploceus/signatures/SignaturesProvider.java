@@ -53,7 +53,7 @@ public class SignaturesProvider {
 
 	@Override
 	public int hashCode() {
-		return sigsPath.hashCode();
+		return isPresent() ? sigsPath.hashCode() : 0;
 	}
 
 	public void provide() {
@@ -135,7 +135,18 @@ public class SignaturesProvider {
 
 		@Override
 		public int hashCode() {
-			return Objects.hash(client, server);
+			if (client.isPresent() && server.isPresent()) {
+				return Objects.hash(client, server);
+			} else {
+				if (client.isPresent()) {
+					return client.hashCode();
+				}
+				if (server.isPresent()) {
+					return server.hashCode();
+				}
+
+				return 0;
+			}
 		}
 
 		@Override

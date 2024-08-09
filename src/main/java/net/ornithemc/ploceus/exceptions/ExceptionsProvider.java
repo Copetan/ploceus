@@ -52,7 +52,7 @@ public class ExceptionsProvider {
 
 	@Override
 	public int hashCode() {
-		return excsPath.hashCode();
+		return isPresent() ? excsPath.hashCode() : 0;
 	}
 
 	public void provide() {
@@ -134,7 +134,18 @@ public class ExceptionsProvider {
 
 		@Override
 		public int hashCode() {
-			return Objects.hash(client, server);
+			if (client.isPresent() && server.isPresent()) {
+				return Objects.hash(client, server);
+			} else {
+				if (client.isPresent()) {
+					return client.hashCode();
+				}
+				if (server.isPresent()) {
+					return server.hashCode();
+				}
+
+				return 0;
+			}
 		}
 
 		@Override
