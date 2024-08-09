@@ -54,9 +54,7 @@ public interface PloceusGradleExtensionApi {
 
 	String oslModule(String module, String version, GameSide side) throws Exception;
 
-	void addCommonLibraries();
-
-	void addCommonLibraries(String configuration);
+	void disableLibraryUpgrades();
 
 	@Deprecated
 	void clientOnlyMappings();

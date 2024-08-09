@@ -54,10 +54,10 @@ public class PloceusGradleExtension implements PloceusGradleExtensionApi {
 	private final Project project;
 	private final LoomGradleExtension loom;
 	private final OslVersionCache oslVersions;
-	private final CommonLibraries commonLibraries;
 	private final Property<ExceptionsProvider> exceptionsProvider;
 	private final Property<SignaturesProvider> signaturesProvider;
 	private final Property<NestsProvider> nestsProvider;
+	private final Property<Boolean> upgradeLibraries;
 	private final Property<GameSide> side; // gen 1
 	private final Property<Integer> generation; // gen 2+
 
@@ -65,7 +65,6 @@ public class PloceusGradleExtension implements PloceusGradleExtensionApi {
 		this.project = project;
 		this.loom = LoomGradleExtension.get(this.project);
 		this.oslVersions = new OslVersionCache(this.project, this);
-		this.commonLibraries = new CommonLibraries(this.project, this);
 		this.exceptionsProvider = project.getObjects().property(ExceptionsProvider.class);
 		this.exceptionsProvider.convention(project.provider(() -> {
 			ExceptionsProvider provider;
@@ -115,6 +114,9 @@ public class PloceusGradleExtension implements PloceusGradleExtensionApi {
 			return provider;
 		}));
 		this.nestsProvider.finalizeValueOnRead();
+		this.upgradeLibraries = project.getObjects().property(Boolean.class);
+		this.upgradeLibraries.convention(project.provider(() -> true));
+		this.upgradeLibraries.finalizeValueOnRead();
 		this.side = project.getObjects().property(GameSide.class);
 		this.side.convention(GameSide.MERGED);
 		this.generation = project.getObjects().property(int.class);
@@ -135,6 +137,7 @@ public class PloceusGradleExtension implements PloceusGradleExtensionApi {
 		project.getConfigurations().register(Constants.SERVER_NESTS_CONFIGURATION);
 
 		loom.getVersionsManifests().add(Constants.VERSIONS_MANIFEST_NAME, Constants.VERSIONS_MANIFEST_URL, -10);
+		loom.getLibraryProcessors().add((platform, context) -> new LibraryUpgrader(this, platform, context));
 		loom.addMinecraftJarProcessor(ExceptionPatcherProcessor.class, this);
 		loom.addMinecraftJarProcessor(SignaturePatcherProcessor.class, this);
 		loom.addMinecraftJarProcessor(NesterProcessor.class, this);
@@ -174,6 +177,10 @@ public class PloceusGradleExtension implements PloceusGradleExtensionApi {
 
 	public NestsProvider getNestsProvider() {
 		return nestsProvider.get();
+	}
+
+	public boolean shouldUpgradeLibraries() {
+		return upgradeLibraries.get();
 	}
 
 	@Override
@@ -354,13 +361,8 @@ public class PloceusGradleExtension implements PloceusGradleExtensionApi {
 	}
 
 	@Override
-	public void addCommonLibraries() {
-		addCommonLibraries("implementation");
-	}
-
-	@Override
-	public void addCommonLibraries(String configuration) {
-		commonLibraries.addDependencies(configuration);
+	public void disableLibraryUpgrades() {
+		upgradeLibraries.set(false);
 	}
 
 	@Override
