@@ -1,2 +1,2 @@
 # ploceus
-An extension to Quilt Loom
+An extension to Fabric/Quilt Loom
