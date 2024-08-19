@@ -7,6 +7,7 @@ public class Constants {
 	public static final String MAVEN_NAME = "Ornithe";
 	public static final String MAVEN_URL = "https://maven.ornithemc.net/releases";
 	public static final String META_URL = "https://meta.ornithemc.net";
+	public static final String MAVEN_GROUP = "net.ornithemc";
 
 	public static final String QUILT_MAVEN_NAME = "Quilt";
 	public static final String QUILT_MAVEN_URL = "https://maven.quiltmc.org/repository/release";
@@ -28,7 +29,7 @@ public class Constants {
 	public static final String VERSION_MANIFEST_PROPERTY = "loom_version_manifests";
 	public static final String VERSIONS_MANIFEST_URL = "https://skyrising.github.io/mc-versions/version_manifest.json";
 
-	public static final String CALAMUS_INTERMEDIARY_MAVEN_GROUP = "net.ornithemc";
+	public static final String CALAMUS_INTERMEDIARY_MAVEN_GROUP = MAVEN_GROUP;
 	public static String calamusGen1Mappings(GameSide side) {
 		return CALAMUS_INTERMEDIARY_MAVEN_GROUP + ":calamus-intermediary:%1$s" + side.suffix() + ":v2";
 	}
@@ -48,7 +49,7 @@ public class Constants {
 		return MAVEN_URL + "/net/ornithemc/calamus-intermediary-gen" + generation + "/%1$s/calamus-intermediary-gen" + generation + "-%1$s-v2.jar";
 	}
 
-	public static final String FEATHER_MAVEN_GROUP = "net.ornithemc";
+	public static final String FEATHER_MAVEN_GROUP = MAVEN_GROUP;
 	public static final String FEATHER_GEN1_MAPPINGS = FEATHER_MAVEN_GROUP + ":feather:%s%s+build.%s:v2";
 	public static String featherGen1Mappings(String mc, GameSide side, String build) {
 		return String.format(FEATHER_GEN1_MAPPINGS, mc, side.suffix(), build);
@@ -58,19 +59,19 @@ public class Constants {
 		return String.format(FEATHER_GEN2_MAPPINGS, generation, mc, build);
 	}
 
-	public static final String RAVEN_MAVEN_GROUP = "net.ornithemc";
+	public static final String RAVEN_MAVEN_GROUP = MAVEN_GROUP;
 	public static final String RAVEN = RAVEN_MAVEN_GROUP + ":raven:%s%s+build.%s";
 	public static String raven(String mc, GameSide side, String build) {
 		return String.format(RAVEN, mc, side.suffix(), build);
 	}
 
-	public static final String SPARROW_MAVEN_GROUP = "net.ornithemc";
+	public static final String SPARROW_MAVEN_GROUP = MAVEN_GROUP;
 	public static final String SPARROW = SPARROW_MAVEN_GROUP + ":sparrow:%s%s+build.%s";
 	public static String sparrow(String mc, GameSide side, String build) {
 		return String.format(SPARROW, mc, side.suffix(), build);
 	}
 
-	public static final String NESTS_MAVEN_GROUP = "net.ornithemc";
+	public static final String NESTS_MAVEN_GROUP = MAVEN_GROUP;
 	public static final String NESTS = NESTS_MAVEN_GROUP + ":nests:%s%s+build.%s";
 	public static String nests(String mc, GameSide side, String build) {
 		return String.format(NESTS, mc, side.suffix(), build);
@@ -79,7 +80,7 @@ public class Constants {
 	public static final String MANIFEST_PATH = "META-INF/MANIFEST.MF";
 	public static final String CALAMUS_GENERATION_ATTRIBUTE = "Calamus-Generation";
 
-	public static final String OSL_MAVEN_GROUP = "net.ornithemc.osl";
+	public static final String OSL_MAVEN_GROUP = MAVEN_GROUP + ".osl";
 	public static final String OSL_CORE = "core";
 
 	public static final String OSL_META_ENDPOINT = "/v3/versions/osl/%s";
