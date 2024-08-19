@@ -26,6 +26,8 @@ public class CommonLibraries {
 		this.libraries.add(Library.all("it.unimi.dsi:fastutil:8.5.9"));
 		this.libraries.add(Library.all("com.google.code.gson:gson:2.10"));
 
+		// logger-config is needed to make log4j work in versions prior to 13w39a
+		this.libraries.add(Library.upTo("13w38c", "net.ornithemc:logger-config:1.0.0"));
 		this.libraries.add(Library.upTo("1.5.2", "com.google.guava:guava:14.0"));
 		this.libraries.add(Library.upTo("1.7.5", "commons-codec:commons-codec:1.9"));
 		this.libraries.add(Library.upTo("1.7.10", "org.apache.commons:commons-compress:1.8.1"));
