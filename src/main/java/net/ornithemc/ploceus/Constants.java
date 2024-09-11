@@ -26,7 +26,7 @@ public class Constants {
 	public static final String CLIENT_NESTS_CONFIGURATION = "clientNests";
 	public static final String SERVER_NESTS_CONFIGURATION = "serverNests";
 
-	public static final String VERSION_MANIFEST_PROPERTY = "loom_version_manifests";
+	public static final String VERSIONS_MANIFEST_NAME = "skyrising";
 	public static final String VERSIONS_MANIFEST_URL = "https://skyrising.github.io/mc-versions/version_manifest.json";
 
 	public static final String CALAMUS_INTERMEDIARY_MAVEN_GROUP = MAVEN_GROUP;

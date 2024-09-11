@@ -134,7 +134,7 @@ public class PloceusGradleExtension implements PloceusGradleExtensionApi {
 		project.getConfigurations().register(Constants.CLIENT_NESTS_CONFIGURATION);
 		project.getConfigurations().register(Constants.SERVER_NESTS_CONFIGURATION);
 
-		loom.getVersionsManifests().add(Constants.VERSIONS_MANIFEST_URL, -10);
+		loom.getVersionsManifests().add(Constants.VERSIONS_MANIFEST_NAME, Constants.VERSIONS_MANIFEST_URL, -10);
 		loom.addMinecraftJarProcessor(ExceptionPatcherProcessor.class, this);
 		loom.addMinecraftJarProcessor(SignaturePatcherProcessor.class, this);
 		loom.addMinecraftJarProcessor(NesterProcessor.class, this);
@@ -426,10 +426,8 @@ public class PloceusGradleExtension implements PloceusGradleExtensionApi {
 		String versionId = minecraftVersion();
 
 		String manifestUrl = Constants.VERSIONS_MANIFEST_URL;
-		String manifestHash = Integer.toHexString(manifestUrl.hashCode());
-
 		Path userCache = loom.getFiles().getUserCache().toPath();
-		Path manifestCache = userCache.resolve("versions_manifest-" + manifestHash + ".json");
+		Path manifestCache = userCache.resolve(Constants.VERSIONS_MANIFEST_NAME + "_versions_manifest.json");
 
 		try {
 			if (!Files.exists(manifestCache)) {
