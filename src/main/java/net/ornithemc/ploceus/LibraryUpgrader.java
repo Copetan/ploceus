@@ -21,7 +21,7 @@ public class LibraryUpgrader extends LibraryProcessor {
 	public LibraryUpgrader(PloceusGradleExtension ploceus, Platform platform, LibraryContext context) {
 		super(platform, context);
 
-		this.minecraftVersion = new Semver(ploceus.minecraftVersion());
+		this.minecraftVersion = new Semver(ploceus.normalizedMinecraftVersion());
 		this.upgrades = new HashSet<>();
 
 		if (ploceus.shouldUpgradeLibraries()) {
