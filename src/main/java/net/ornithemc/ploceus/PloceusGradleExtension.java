@@ -118,7 +118,18 @@ public class PloceusGradleExtension implements PloceusGradleExtensionApi {
 		this.upgradeLibraries.convention(project.provider(() -> true));
 		this.upgradeLibraries.finalizeValueOnRead();
 		this.side = project.getObjects().property(GameSide.class);
-		this.side.convention(GameSide.MERGED);
+		this.side.convention(project.provider(() -> {
+			VersionDetails details = minecraftVersionDetails();
+
+			if (!details.server()) {
+				return GameSide.CLIENT;
+			}
+			if (!details.client()) {
+				return GameSide.SERVER;
+			}
+
+			return GameSide.MERGED;
+		}));
 		this.generation = project.getObjects().property(int.class);
 		this.generation.convention(1);
 
@@ -423,8 +434,10 @@ public class PloceusGradleExtension implements PloceusGradleExtensionApi {
 	}
 
 	public String normalizedMinecraftVersion() {
-		// the normalized version id can be parsed from the version details file
+		return minecraftVersionDetails().normalizedVersion();
+	}
 
+	public VersionDetails minecraftVersionDetails() {
 		String versionId = minecraftVersion();
 
 		String manifestUrl = Constants.VERSIONS_MANIFEST_URL;
@@ -448,13 +461,11 @@ public class PloceusGradleExtension implements PloceusGradleExtensionApi {
 				}
 
 				try (BufferedReader _br = new BufferedReader(new FileReader(detailsCache.toFile()))) {
-					VersionDetails details = GSON.fromJson(_br, VersionDetails.class);
-					return details.normalizedVersion();
+					return GSON.fromJson(_br, VersionDetails.class);
 				}
 			}
 		} catch (Exception e) {
-			project.getLogger().warn("unable to read version details, cannot normalize minecraft version id", e);
-			return versionId;
+			throw new RuntimeException("unable to read version details", e);
 		}
 	}
 }
