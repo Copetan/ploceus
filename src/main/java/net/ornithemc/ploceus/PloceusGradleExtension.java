@@ -72,7 +72,12 @@ public class PloceusGradleExtension implements PloceusGradleExtensionApi {
 				if (getGeneration().get() == 1) {
 					provider = new ExceptionsProvider.Legacy(project, loom, this, getSide().get());
 				} else {
-					provider = new ExceptionsProvider.Split(project, loom, this);
+					VersionDetails details = minecraftVersionDetails();
+					if (details.releaseTime().compareTo(Constants.RELEASE_TIME_B1_0) >= 0) {
+						provider = new ExceptionsProvider.Split(project, loom, this);
+					} else {
+						provider = new ExceptionsProvider.Legacy(project, loom, this, details.client() ? GameSide.CLIENT : GameSide.SERVER);
+					}
 				}
 			} else {
 				provider = new ExceptionsProvider.Simple(project, loom, this);
@@ -88,7 +93,12 @@ public class PloceusGradleExtension implements PloceusGradleExtensionApi {
 				if (getGeneration().get() == 1) {
 					provider = new SignaturesProvider.Legacy(project, loom, this, getSide().get());
 				} else {
-					provider = new SignaturesProvider.Split(project, loom, this);
+					VersionDetails details = minecraftVersionDetails();
+					if (details.releaseTime().compareTo(Constants.RELEASE_TIME_B1_0) >= 0) {
+						provider = new SignaturesProvider.Split(project, loom, this);
+					} else {
+						provider = new SignaturesProvider.Legacy(project, loom, this, details.client() ? GameSide.CLIENT : GameSide.SERVER);
+					}
 				}
 			} else {
 				provider = new SignaturesProvider.Simple(project, loom, this);
@@ -104,7 +114,12 @@ public class PloceusGradleExtension implements PloceusGradleExtensionApi {
 				if (getGeneration().get() == 1) {
 					provider = new NestsProvider.Legacy(project, loom, this, getSide().get());
 				} else {
-					provider = new NestsProvider.Split(project, loom, this);
+					VersionDetails details = minecraftVersionDetails();
+					if (details.releaseTime().compareTo(Constants.RELEASE_TIME_B1_0) >= 0) {
+						provider = new NestsProvider.Split(project, loom, this);
+					} else {
+						provider = new NestsProvider.Legacy(project, loom, this, details.client() ? GameSide.CLIENT : GameSide.SERVER);
+					}
 				}
 			} else {
 				provider = new NestsProvider.Simple(project, loom, this);
