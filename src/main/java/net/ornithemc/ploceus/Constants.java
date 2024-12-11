@@ -93,4 +93,6 @@ public class Constants {
 	public static final String FORGE_MAVEN_GROUP = "net.minecraftforge.mcp";
 	public static final String FORGE_SRC = FORGE_MAVEN_GROUP + ":forge:%s-%s:src@zip";
 
+	public static final String RELEASE_TIME_B1_0 = "2010-12-20T17:28:00+00:00";
+
 }
